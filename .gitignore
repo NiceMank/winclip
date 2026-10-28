@@ -14,3 +14,9 @@ images/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Environnement virtuel local (--venv)
+.venv/
+
+# Rendus de travail locaux
+/visual/

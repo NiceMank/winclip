@@ -1,0 +1,8 @@
+# Dépendances d'exécution de WinClip
+PyQt6>=6.5
+
+# Dépendances de développement (facultatives) :
+#   pycairo — régénération des icônes historiques (assets/make_icons.py)
+#   Pillow  — régénération des icônes v2 (assets/make_icons_extra.py)
+# pycairo>=1.21
+# Pillow>=9.0

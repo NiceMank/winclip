@@ -3,7 +3,7 @@ import math
 import os
 import cairo
 
-OUT_DIR = "/run/media/niceman/Nice/ProjetsWeb/Outils System/WinClip/assets/icons"
+OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
 os.makedirs(OUT_DIR, exist_ok=True)
 SIZE = 96  # Haute résolution (96x96, redimensionné avec netteté)
 

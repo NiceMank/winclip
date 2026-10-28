@@ -1,2 +1,2 @@
-"""Package WinClip - Gestionnaire de presse-papier moderne pour Linux."""
-__version__ = "1.0.0"
+"""Package WinClip — gestionnaire de presse-papier moderne pour Linux."""
+__version__ = "2.0.0"

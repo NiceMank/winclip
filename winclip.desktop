@@ -1,8 +1,9 @@
 [Desktop Entry]
 Name=WinClip
-Comment=Presse-papier moderne façon Windows (Win+V) pour Linux
-Exec=/run/media/niceman/Nice/ProjetsWeb/Outils System/WinClip/run.sh toggle
-Icon=/run/media/niceman/Nice/ProjetsWeb/Outils System/WinClip/assets/icon.png
+GenericName=Clipboard Manager
+Comment=Presse-papier moderne façon Windows 11 (Super+V) pour Linux
+Exec=__APP_DIR__/run.sh toggle
+Icon=__APP_DIR__/assets/icon.png
 Terminal=false
 Type=Application
 Categories=Utility;Accessories;
