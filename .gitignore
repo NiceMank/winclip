@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases & local user data
+*.db
+*.sqlite3
+images/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
