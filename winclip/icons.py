@@ -10,8 +10,14 @@ from PyQt6.QtGui import QIcon, QPixmap, QPainter, QColor
 
 ICONS_DIR = Path(__file__).resolve().parent.parent / "assets" / "icons"
 
-# Icônes monochromes susceptibles d'être teintées selon le thème
-TINTABLE_ICONS = {"close", "pin"}
+# Toutes les icônes vectorielles peuvent être teintées pour s'adapter au thème
+# (sombre -> blanc/gris clair, clair -> sombre, ou couleur d'accent)
+TINTABLE_ICONS = {
+    "clipboard", "pin", "pin_filled", "emoji", "settings", "clear",
+    "close", "pause", "play", "search", "trash", "copy", "paste",
+    "open", "url", "code", "email", "color", "image", "folder",
+    "phone", "text", "check"
+}
 
 # Cache des pixmaps déjà mis à l'échelle : (nom, taille, teinte) -> QPixmap
 _PIXMAP_CACHE: dict[tuple[str, int, str | None], QPixmap] = {}

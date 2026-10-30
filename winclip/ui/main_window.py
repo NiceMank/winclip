@@ -169,10 +169,10 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(14, 10, 10, 10)
         layout.setSpacing(8)
 
-        icon_label = QLabel()
-        icon_label.setPixmap(create_icon_pixmap("clipboard", size=20))
-        icon_label.setStyleSheet("background: transparent;")
-        layout.addWidget(icon_label)
+        self.header_icon = QLabel()
+        self.header_icon.setPixmap(create_icon_pixmap("clipboard", size=20))
+        self.header_icon.setStyleSheet("background: transparent;")
+        layout.addWidget(self.header_icon)
 
         self.title_label = QLabel(tr("title"))
         self.title_label.setObjectName("HeaderTitle")
@@ -290,8 +290,17 @@ class MainWindow(QMainWindow):
         # Ombre adaptée au thème
         self._shadow.setColor(QColor(0, 0, 0, palette.get("shadow_alpha", 180)))
 
-        # Icônes monochromes teintées selon le thème
-        self.close_btn.setIcon(get_icon("close", size=13, color=palette["text_secondary"]))
+        # Icônes de l'en-tête et onglets teintées selon le thème
+        fg = palette["text_primary"]
+        fg_sec = palette["text_secondary"]
+        self.header_icon.setPixmap(create_icon_pixmap("clipboard", size=20, color=palette["accent"]))
+        self.pause_btn.setIcon(get_icon("play" if settings.get("monitor_paused", False) else "pause", size=14, color=fg_sec))
+        self.settings_btn.setIcon(get_icon("settings", size=15, color=fg_sec))
+        self.clear_btn.setIcon(get_icon("clear", size=16, color=fg_sec))
+        self.close_btn.setIcon(get_icon("close", size=13, color=fg_sec))
+        self.tab_all.setIcon(get_icon("clipboard", size=15, color=fg))
+        self.tab_pinned.setIcon(get_icon("pin_filled", size=15, color=palette.get("badge_pinned", "#f39c12")))
+        self.tab_emoji.setIcon(get_icon("emoji", size=15, color=fg))
 
         # Couleurs des cartes existantes (badges + icônes monochromes)
         for card in self._cards:
@@ -321,7 +330,8 @@ class MainWindow(QMainWindow):
         self.status_dot.setProperty("paused", paused)
         self.status_dot.style().unpolish(self.status_dot)
         self.status_dot.style().polish(self.status_dot)
-        self.pause_btn.setIcon(get_icon("play" if paused else "pause", size=14))
+        fg_sec = self._palette.get("text_secondary", "#aaaaaa") if hasattr(self, "_palette") and self._palette else "#aaaaaa"
+        self.pause_btn.setIcon(get_icon("play" if paused else "pause", size=14, color=fg_sec))
         self.pause_btn.setToolTip(tr("tip_resume") if paused else tr("tip_pause"))
 
     def _refresh_footer(self):

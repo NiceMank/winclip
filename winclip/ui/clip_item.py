@@ -142,8 +142,15 @@ class ClipItemWidget(QFrame):
     def apply_theme_colors(self, palette: dict):
         """(Ré)applique les couleurs du thème actif (badge + icône épingler)."""
         self._palette = palette
-        self.set_badge_color(palette.get(self._badge_color_key, palette["badge_text"]))
+        badge_color = palette.get(self._badge_color_key, palette["badge_text"])
+        self.set_badge_color(badge_color)
+        content_type = self.item.get("content_type", "text")
+        icon_name, _ = TYPE_ICON_MAP.get(content_type, ("text", "badge_text"))
+        if hasattr(self, "type_icon_label"):
+            self.type_icon_label.setPixmap(create_icon_pixmap(icon_name, size=16, color=badge_color))
         self._update_pin_icon(bool(self.item.get("is_pinned", 0)))
+        if hasattr(self, "delete_btn"):
+            self.delete_btn.setIcon(get_icon("trash", size=14, color=palette["text_muted"]))
 
     # ------------------------------------------------------------------
     def _init_ui(self):
@@ -160,9 +167,10 @@ class ClipItemWidget(QFrame):
         icon_name, badge_color_key = TYPE_ICON_MAP.get(
             content_type, ("text", "badge_text")
         )
-        icon_label = QLabel()
-        icon_label.setPixmap(create_icon_pixmap(icon_name, size=18))
-        header_layout.addWidget(icon_label)
+        self.type_icon_label = QLabel()
+        self.type_icon_label.setPixmap(create_icon_pixmap(icon_name, size=16))
+        self.type_icon_label.setStyleSheet("background: transparent;")
+        header_layout.addWidget(self.type_icon_label)
 
         # Libellé du type (badge coloré — couleur appliquée par le thème)
         type_badge = QLabel(resolve_label(self.item))
