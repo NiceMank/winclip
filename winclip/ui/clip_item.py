@@ -10,10 +10,10 @@ Design v2 façon Windows 11 :
 import time
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, pyqtSignal, QRectF, QPoint
+from PyQt6.QtCore import Qt, pyqtSignal, QRectF, QPoint, QSize
 from PyQt6.QtGui import QPixmap, QPainter, QPainterPath, QCursor
 from PyQt6.QtWidgets import (
-    QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidget
+    QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidget, QSizePolicy
 )
 
 from ..config import MAX_PREVIEW_LENGTH
@@ -86,12 +86,12 @@ def elide_lines(text: str, font, max_px: int = 320) -> str:
 def elide_chars(text: str, max_chars: int) -> str:
     """Coupe chaque ligne à `max_chars` caractères (déterministe, sans fonte).
 
-    Utilisé pour les blocs monospace (code, chemins) et les URL : garantit
-    une largeur minimale de carte toujours inférieure au popup, quelle que
-    soit la police effectivement résolue par le style.
+    Convertit les tabulations en espaces (expandtabs) pour éviter que Qt
+    n'élargisse démesurément la carte lors du calcul de taille.
     """
     out = []
     for line in text.splitlines():
+        line = line.expandtabs(4)
         if len(line) > max_chars:
             line = line[: max_chars - 1].rstrip() + "…"
         out.append(line)
@@ -137,7 +137,12 @@ class ClipItemWidget(QFrame):
         self.setProperty("pinned", bool(item.get("is_pinned", 0)))
         self.setProperty("selected", False)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self._init_ui()
+
+    def minimumSizeHint(self) -> QSize:
+        sh = super().minimumSizeHint()
+        return QSize(0, sh.height())
 
     def apply_theme_colors(self, palette: dict):
         """(Ré)applique les couleurs du thème actif (badge + icône épingler)."""
@@ -276,19 +281,21 @@ class ClipItemWidget(QFrame):
                 preview += "\n…"
             code_label = QLabel()
             code_label.setProperty("class", "CodeText")
-            code_label.setText(elide_chars(preview, 46))
+            code_label.setText(elide_chars(preview, 36))
             code_label.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             code_label.setWordWrap(False)
+            code_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             return code_label
 
         # D. URL → lien souligné
         if content_type == "url":
             url_label = QLabel()
             url_label.setProperty("class", "UrlText")
-            url_label.setText(elide_chars(content, 52))
+            url_label.setText(elide_chars(content, 42))
             url_label.setStyleSheet("text-decoration: underline;")
             url_label.setWordWrap(True)
             url_label.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+            url_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             return url_label
 
         # E. Chemin de fichier → monospace abrégé (~) et coupé
@@ -301,14 +308,16 @@ class ClipItemWidget(QFrame):
                 display += f"\n… (+{len(paths) - 3})"
             path_label = QLabel()
             path_label.setProperty("class", "PathText")
-            path_label.setText(elide_chars(display, 44))
+            path_label.setText(elide_chars(display, 36))
             path_label.setWordWrap(True)
+            path_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             return path_label
 
         # F. Téléphone
         if content_type == "phone":
             phone_label = QLabel(content)
             phone_label.setProperty("class", "PhoneText")
+            phone_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             return phone_label
 
         # G. E-mail
@@ -316,6 +325,7 @@ class ClipItemWidget(QFrame):
             email_label = QLabel(content)
             email_label.setProperty("class", "ContentText")
             email_label.setWordWrap(True)
+            email_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             return email_label
 
         # H. Texte standard → aperçu 3 lignes, tokens trop longs coupés
@@ -329,9 +339,10 @@ class ClipItemWidget(QFrame):
         text_label = QLabel()
         text_label.setProperty("class", "ContentText")
         text_font = _font_px('DejaVu Sans', 13)
-        text_label.setText(elide_lines(preview, text_font, 320))
+        text_label.setText(elide_lines(preview, text_font, 300))
         text_label.setWordWrap(True)
         text_label.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        text_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         return text_label
 
     # ------------------------------------------------------------------

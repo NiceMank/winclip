@@ -9,7 +9,7 @@ Nouveautés v2 :
   - interface traduite FR/EN.
 """
 from PyQt6.QtCore import (
-    Qt, pyqtSignal, QPoint, QTimer, QPropertyAnimation, QEasingCurve, QUrl,
+    Qt, pyqtSignal, QPoint, QTimer, QPropertyAnimation, QEasingCurve, QUrl, QSize,
 )
 from PyQt6.QtGui import QKeyEvent, QGuiApplication, QCursor, QColor, QImage, QDesktopServices
 from PyQt6.QtWidgets import (
@@ -28,6 +28,23 @@ from .clip_item import ClipItemWidget
 from .emoji_picker import EmojiPickerWidget
 from .settings_dialog import SettingsDialog
 from .styles import build_stylesheet
+
+
+class _ScrollContentWidget(QWidget):
+    """Conteneur interne de QScrollArea contraint à la largeur du viewport.
+
+    En retournant 0 comme largeur de minimumSizeHint, QScrollArea avec
+    setWidgetResizable(True) aligne strictement la largeur du conteneur
+    sur celle du viewport, éliminant tout défilement horizontal résiduel.
+    """
+
+    def minimumSizeHint(self) -> QSize:
+        sh = super().minimumSizeHint()
+        return QSize(0, sh.height())
+
+    def sizeHint(self) -> QSize:
+        sh = super().sizeHint()
+        return QSize(0, sh.height())
 
 
 class DraggableHeader(QFrame):
@@ -128,7 +145,7 @@ class MainWindow(QMainWindow):
         self.clips_scroll.setWidgetResizable(True)
         self.clips_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.clips_content = QWidget()
+        self.clips_content = _ScrollContentWidget()
         self.clips_content.setStyleSheet("background: transparent;")
         self.clips_layout = QVBoxLayout(self.clips_content)
         self.clips_layout.setContentsMargins(10, 6, 4, 6)
